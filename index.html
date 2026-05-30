@@ -1,699 +1,650 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>星语小剧场｜AI 居家情绪干预互动平台</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            boxShadow: {
-              glass: "0 18px 60px rgba(0,0,0,0.26)",
-              "glass-hover": "0 26px 80px rgba(0,0,0,0.32)"
-            },
-            keyframes: {
-              floaty: {
-                "0%, 100%": { transform: "translate3d(0,0,0)" },
-                "50%": { transform: "translate3d(0,-10px,0)" }
-              },
-              drift: {
-                "0%, 100%": { transform: "translate3d(0,0,0)" },
-                "50%": { transform: "translate3d(8px,-8px,0)" }
-              },
-              pulseGlow: {
-                "0%, 100%": { opacity: "0.55" },
-                "50%": { opacity: "0.95" }
-              }
-            },
-            animation: {
-              floaty6: "floaty 6s ease-in-out infinite",
-              floaty8: "floaty 8s ease-in-out infinite",
-              drift12: "drift 12s ease-in-out infinite",
-              pulseGlow6: "pulseGlow 6s ease-in-out infinite"
-            }
-          }
-        }
-      };
-    </script>
-    <style>
-      :root {
-        --bg-0: #0e3243;
-        --bg-1: #335e74;
-        --bg-2: #5f8d9b;
-        --accent: #f5d67b;
-        --mint: #a6d6c3;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>星语小剧场 · 9:16 H5</title>
+  <style>
+    :root{
+      --bg1:#fff8f1;
+      --bg2:#ffe8d8;
+      --bg3:#f7cfbb;
+      --bg4:#ffbf99;
+      --ink:#40352f;
+      --muted:#78685d;
+      --soft:#9a8678;
+      --card:rgba(255,255,255,.58);
+      --card2:rgba(255,255,255,.42);
+      --stroke:rgba(120,98,86,.14);
+      --stroke2:rgba(255,255,255,.62);
+      --primary:#ff9f68;
+      --primary2:#ffc58f;
+      --accent:#ffd96b;
+      --mint:#bfe6d7;
+      --sky:#b9dcff;
+      --shadow:0 18px 50px rgba(138,98,74,.12);
+      --radius-xl:34px;
+      --radius-lg:28px;
+      --radius-md:20px;
+    }
 
-      body {
-        font-family: ui-rounded, "PingFang SC", "Microsoft YaHei UI", "Microsoft YaHei", "Noto Sans SC",
-          system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-      }
+    *{box-sizing:border-box}
+    html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:Inter,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,-apple-system,sans-serif;background:
+      radial-gradient(circle at 18% 14%, rgba(255,255,255,.78), transparent 26%),
+      radial-gradient(circle at 84% 18%, rgba(255,214,107,.25), transparent 18%),
+      radial-gradient(circle at 70% 82%, rgba(255,159,104,.16), transparent 24%),
+      linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 38%, var(--bg3) 72%, var(--bg4) 100%);
+      color:var(--ink);
+    }
 
-      .star-sky {
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(160deg, var(--bg-0) 0%, var(--bg-1) 45%, var(--bg-2) 100%);
-      }
+    /* soft decorative clouds */
+    body::before, body::after{
+      content:"";
+      position:fixed;
+      inset:-5%;
+      pointer-events:none;
+      background:
+        radial-gradient(circle at 13% 18%, rgba(255,255,255,.72) 0 16px, transparent 17px),
+        radial-gradient(circle at 18% 18%, rgba(255,255,255,.72) 0 22px, transparent 23px),
+        radial-gradient(circle at 24% 18%, rgba(255,255,255,.72) 0 18px, transparent 19px),
+        radial-gradient(circle at 78% 13%, rgba(255,255,255,.55) 0 18px, transparent 19px),
+        radial-gradient(circle at 84% 13%, rgba(255,255,255,.55) 0 24px, transparent 25px),
+        radial-gradient(circle at 91% 13%, rgba(255,255,255,.55) 0 16px, transparent 17px);
+      opacity:.25;
+      filter:blur(2px);
+      transform:translateY(-8%);
+    }
+    body::after{
+      background:
+        radial-gradient(circle at 10% 76%, rgba(255,255,255,.45) 0 10px, transparent 11px),
+        radial-gradient(circle at 17% 79%, rgba(255,255,255,.45) 0 16px, transparent 17px),
+        radial-gradient(circle at 86% 82%, rgba(255,255,255,.30) 0 12px, transparent 13px);
+      opacity:.32;
+      filter:blur(.5px);
+    }
 
-      .star-sky::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background-image: radial-gradient(circle, rgba(255, 255, 255, 0.55) 1px, transparent 1.2px),
-          radial-gradient(circle, rgba(255, 245, 225, 0.38) 1px, transparent 1.4px),
-          radial-gradient(circle, rgba(255, 255, 255, 0.28) 1px, transparent 1.6px);
-        background-size: 120px 120px, 180px 180px, 260px 260px;
-        background-position: 10px 18px, 70px 120px, 140px 40px;
-        opacity: 0.55;
-        filter: drop-shadow(0 0 8px rgba(255, 245, 225, 0.14));
-      }
+    .app{position:relative;width:100vw;height:100vh}
+    .topbar{
+      position:absolute;z-index:20;left:50%;top:max(12px,env(safe-area-inset-top));
+      transform:translateX(-50%);
+      padding:10px 16px;border-radius:999px;
+      background:rgba(255,255,255,.58);
+      border:1px solid rgba(255,255,255,.7);
+      box-shadow:0 10px 24px rgba(145,100,72,.10);
+      backdrop-filter:blur(20px);
+      font-size:13px;color:#6f5c4f;display:flex;gap:8px;align-items:center;white-space:nowrap;
+    }
+    .topbar strong{color:var(--ink);font-weight:900}
+    .topbar .dot{width:6px;height:6px;border-radius:999px;background:var(--primary);box-shadow:0 0 0 5px rgba(255,159,104,.15)}
 
-      .star-sky::after {
-        content: "";
-        position: absolute;
-        inset: -40px;
-        background: radial-gradient(circle at 18% 14%, rgba(245, 214, 123, 0.12), transparent 46%),
-          radial-gradient(circle at 82% 26%, rgba(166, 214, 195, 0.16), transparent 50%),
-          radial-gradient(circle at 30% 88%, rgba(255, 255, 255, 0.08), transparent 55%);
-        filter: blur(6px);
-        opacity: 0.9;
-      }
+    .scroller{
+      width:100%;height:100%;
+      display:flex;overflow-x:auto;overflow-y:hidden;
+      scroll-snap-type:x mandatory;scroll-behavior:smooth;
+      -webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;
+      scrollbar-width:none;touch-action:pan-x;
+    }
+    .scroller::-webkit-scrollbar{display:none}
 
-      .glass-card {
-        border-radius: 28px;
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        box-shadow: 0 18px 60px rgba(0, 0, 0, 0.26);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-      }
+    .page{
+      flex:0 0 100vw;height:100vh;scroll-snap-align:start;
+      padding:calc(58px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom));
+      display:flex;justify-content:center;align-items:center;
+    }
 
-      .page-card {
-        will-change: transform, filter, opacity;
-        transform-origin: center center;
-      }
+    .sheet{
+      position:relative;overflow:hidden;
+      width:min(100%, 420px);height:min(100%, 920px);
+      border-radius:38px;
+      background:linear-gradient(180deg, rgba(255,255,255,.68), rgba(255,255,255,.42));
+      border:1px solid rgba(255,255,255,.78);
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(22px);
+      display:flex;flex-direction:column;
+      padding:16px;
+    }
+    .sheet::before{
+      content:"";
+      position:absolute;inset:0;
+      background:
+        radial-gradient(circle at 18% 10%, rgba(255,159,104,.10), transparent 17%),
+        radial-gradient(circle at 85% 18%, rgba(255,214,107,.14), transparent 16%),
+        radial-gradient(circle at 55% 100%, rgba(185,220,255,.18), transparent 20%);
+      pointer-events:none;
+    }
+    .inner{position:relative;z-index:1;display:flex;flex-direction:column;height:100%}
 
-      .tile {
-        display: flex;
-        gap: 12px;
-        padding: 12px;
-        border-radius: 16px;
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-      }
+    .head{
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+      margin-bottom:10px;color:#7b675b;font-size:12px
+    }
+    .tag{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:8px 12px;border-radius:999px;
+      background:rgba(255,255,255,.62);border:1px solid rgba(120,98,86,.10);
+      box-shadow:0 4px 14px rgba(120,98,86,.06)
+    }
+    .tag b{color:var(--ink);font-weight:900}
+    .no{font-variant-numeric:tabular-nums;letter-spacing:1px}
 
-      .tile-strong {
-        background: rgba(255, 255, 255, 0.09);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-      }
+    .hero{
+      position:relative;
+      padding:14px 14px 16px;
+      border-radius:30px;
+      background:linear-gradient(180deg, rgba(255,244,236,.85), rgba(255,255,255,.52));
+      border:1px solid rgba(120,98,86,.12);
+      overflow:hidden;
+    }
+    .hero::after{
+      content:"";
+      position:absolute;right:-30px;top:-35px;width:170px;height:170px;border-radius:50%;
+      background:radial-gradient(circle, rgba(255,214,107,.35), transparent 68%);
+      filter:blur(3px);
+    }
+    .kicker{
+      display:inline-flex;align-items:center;gap:8px;
+      font-size:12px;color:#8a7264;font-weight:800;
+      margin-bottom:10px;
+    }
+    .kicker .pill{
+      width:20px;height:20px;border-radius:999px;
+      background:linear-gradient(180deg, var(--accent), rgba(255,255,255,.9));
+      display:grid;place-items:center;font-size:12px;box-shadow:0 8px 16px rgba(255,214,107,.25)
+    }
+    h1{
+      margin:0;color:var(--ink);font-size:clamp(30px, 7vw, 42px);
+      line-height:1.02;letter-spacing:-.8px;font-weight:900;
+    }
+    .sub{
+      margin-top:10px;color:#6f5c50;font-size:15px;line-height:1.55
+    }
 
-      .pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 6px 10px;
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-      }
+    .pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    .pill{
+      padding:8px 11px;border-radius:999px;
+      background:rgba(255,255,255,.7);
+      border:1px solid rgba(120,98,86,.10);
+      color:#735f53;font-size:12px;font-weight:700
+    }
+    .pill.primary{background:rgba(255,159,104,.16);color:#a75f34;border-color:rgba(255,159,104,.18)}
+    .pill.mint{background:rgba(191,230,215,.25);color:#4f7b68}
+    .pill.sky{background:rgba(185,220,255,.30);color:#5a7994}
 
-      .icon {
-        width: 22px;
-        height: 22px;
-        stroke: currentColor;
-        fill: none;
-        stroke-width: 1.8;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-        flex: 0 0 auto;
-      }
-    </style>
-  </head>
-  <body class="h-screen overflow-hidden text-white/90">
-    <div class="relative h-full w-full">
-      <div class="star-sky"></div>
+    .stack{display:grid;gap:12px;margin-top:12px}
+    .grid2{display:grid;grid-template-columns:1.2fr .8fr;gap:12px}
 
-      <svg aria-hidden="true" class="absolute h-0 w-0">
-        <symbol id="i-star" viewBox="0 0 24 24">
-          <path
-            d="M12 2.7l2.2 6.3 6.7.1-5.4 4 2 6.4L12 15.8 6.5 19.5l2-6.4-5.4-4 6.7-.1L12 2.7z"
-          />
-        </symbol>
-        <symbol id="i-theater" viewBox="0 0 24 24">
-          <path d="M4 6c2.3-2.1 5.2-3.3 8-3.3S17.7 3.9 20 6" />
-          <path d="M5.2 19.2c2 .8 4.4 1.3 6.8 1.3s4.8-.5 6.8-1.3" />
-          <path d="M6.2 8.1v7.4c0 1.3 1 2.3 2.3 2.3h7c1.3 0 2.3-1 2.3-2.3V8.1" />
-          <path d="M9.2 11.2c.8-.7 1.8-1.1 2.8-1.1s2 .4 2.8 1.1" />
-          <path d="M9.2 14.4c.8.7 1.8 1.1 2.8 1.1s2-.4 2.8-1.1" />
-        </symbol>
-        <symbol id="i-home-heart" viewBox="0 0 24 24">
-          <path d="M3 10.3 12 3l9 7.3V21a1.5 1.5 0 0 1-1.5 1.5H4.5A1.5 1.5 0 0 1 3 21V10.3z" />
-          <path d="M12 19.6s-3.3-1.9-4.8-3.9c-1.2-1.6-.6-3.7 1.2-4.4 1.2-.5 2.6-.1 3.6 1 1-1.1 2.4-1.5 3.6-1 1.8.7 2.4 2.8 1.2 4.4-1.5 2-4.8 3.9-4.8 3.9z" />
-        </symbol>
-        <symbol id="i-pin" viewBox="0 0 24 24">
-          <path d="M12 21s7-5.2 7-11a7 7 0 1 0-14 0c0 5.8 7 11 7 11z" />
-          <path d="M12 10.5a1.7 1.7 0 1 0 0-3.4 1.7 1.7 0 0 0 0 3.4z" />
-        </symbol>
-        <symbol id="i-bored" viewBox="0 0 24 24">
-          <path d="M8.2 9.7h.01" />
-          <path d="M15.8 9.7h.01" />
-          <path d="M8.5 15.7c2.2-1.6 4.8-1.6 7 0" />
-          <path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z" />
-        </symbol>
-        <symbol id="i-seedling" viewBox="0 0 24 24">
-          <path d="M12 21v-7" />
-          <path d="M12 14c0-4.2 3.4-7.6 7.6-7.6 0 4.2-3.4 7.6-7.6 7.6z" />
-          <path d="M12 14C7.8 14 4.4 10.6 4.4 6.4c4.2 0 7.6 3.4 7.6 7.6z" />
-        </symbol>
-        <symbol id="i-book" viewBox="0 0 24 24">
-          <path d="M4.5 4.5h11c1.7 0 3 1.3 3 3v12h-11c-1.7 0-3-1.3-3-3v-12z" />
-          <path d="M7.5 4.5v15" />
-          <path d="M18.5 19.5c0-1.7-1.3-3-3-3h-11" />
-        </symbol>
-        <symbol id="i-smile" viewBox="0 0 24 24">
-          <path d="M8.2 10h.01" />
-          <path d="M15.8 10h.01" />
-          <path d="M8.6 14.2c1 .9 2.2 1.4 3.4 1.4s2.4-.5 3.4-1.4" />
-          <path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z" />
-        </symbol>
-        <symbol id="i-trophy" viewBox="0 0 24 24">
-          <path d="M7 4h10v4a5 5 0 0 1-10 0V4z" />
-          <path d="M12 13v3" />
-          <path d="M8.5 22h7" />
-          <path d="M6 6H4c0 3 2 5 5 5" />
-          <path d="M18 6h2c0 3-2 5-5 5" />
-        </symbol>
-        <symbol id="i-camera" viewBox="0 0 24 24">
-          <path d="M4 7h3l2-2h6l2 2h3v14H4V7z" />
-          <path d="M12 18a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />
-        </symbol>
-        <symbol id="i-magic" viewBox="0 0 24 24">
-          <path d="M3 21l12-12" />
-          <path d="M12 6l3-3 3 3-3 3-3-3z" />
-          <path d="M16 12l3-3 2 2-3 3-2-2z" />
-          <path d="M4.5 16.5l3 3" />
-        </symbol>
-        <symbol id="i-pace" viewBox="0 0 24 24">
-          <path d="M3.5 12h3.5l2-4 3.5 8 2-4h6.5" />
-          <path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z" />
-        </symbol>
-        <symbol id="i-heart" viewBox="0 0 24 24">
-          <path
-            d="M12 20.7s-7.2-4.2-9.2-8.3C1.4 9.2 3.3 6.4 6.5 6.4c2 0 3.7 1 5.5 3 1.8-2 3.5-3 5.5-3 3.2 0 5.1 2.8 3.7 6-2 4.1-9.2 8.3-9.2 8.3z"
-          />
-        </symbol>
-        <symbol id="i-people" viewBox="0 0 24 24">
-          <path d="M16.5 21v-1.6c0-1.9-1.6-3.4-3.5-3.4H7c-1.9 0-3.5 1.5-3.5 3.4V21" />
-          <path d="M10 12.8a3.1 3.1 0 1 0 0-6.2 3.1 3.1 0 0 0 0 6.2z" />
-          <path d="M20.5 21v-1.2c0-1.7-1.2-3.1-2.8-3.4" />
-          <path d="M16.4 12.7a2.6 2.6 0 1 0 0-5.2" />
-        </symbol>
-        <symbol id="i-child" viewBox="0 0 24 24">
-          <path d="M12 7.2a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4z" />
-          <path d="M7 21v-5.2c0-2.2 1.8-4 4-4h2c2.2 0 4 1.8 4 4V21" />
-          <path d="M10 21v-6" />
-          <path d="M14 21v-6" />
-        </symbol>
-      </svg>
+    .card{
+      border-radius:var(--radius-lg);
+      background:var(--card);
+      border:1px solid var(--stroke);
+      box-shadow:0 10px 24px rgba(140,105,79,.07);
+      backdrop-filter:blur(18px);
+    }
+    .card.soft{
+      background:linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,255,255,.40));
+    }
 
-      <div class="absolute top-3 left-1/2 -translate-x-1/2 z-10">
-        <div class="rounded-full bg-white/10 border border-white/15 px-3 py-1.5 text-[11px] text-white/85 backdrop-blur-xl">
-          <span class="font-semibold text-white">左右滑动</span>
-          <span class="ml-1">每页 3 秒读懂</span>
-          <span class="ml-2 text-white/60">← →</span>
-        </div>
-      </div>
+    .pain{
+      padding:16px;
+      min-height:146px;
+      display:flex;flex-direction:column;justify-content:space-between;
+    }
+    .pain .label{
+      font-size:12px;color:#8a7264;font-weight:800;display:flex;align-items:center;gap:8px
+    }
+    .big-num{
+      display:flex;align-items:flex-end;gap:10px
+    }
+    .big-num strong{
+      font-size:58px;line-height:.9;font-weight:900;letter-spacing:-2px;color:#a95f35
+    }
+    .big-num span{font-size:13px;color:#7b675b;padding-bottom:10px}
+    .highlight-row{
+      display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:2px
+    }
+    .mini{
+      padding:12px 10px;border-radius:20px;
+      background:rgba(255,255,255,.58);
+      border:1px solid rgba(120,98,86,.10);
+      text-align:center
+    }
+    .mini strong{display:block;font-size:14px;font-weight:900;color:var(--ink)}
+    .mini span{display:block;margin-top:3px;font-size:11px;color:#7b675b;line-height:1.35}
 
-      <div
-        id="deck"
-        class="relative h-full w-full overflow-x-auto overflow-y-hidden snap-x snap-mandatory scroll-smooth flex [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-      >
-        <section data-page class="min-h-screen min-w-full px-4 py-6 flex items-center justify-center snap-start">
-          <article
-            data-card
-            class="glass-card page-card relative w-[min(92vw,430px)] aspect-[9/16] overflow-hidden transform-gpu"
-          >
-            <div class="pointer-events-none absolute inset-0">
-              <div class="absolute -top-20 -right-20 h-56 w-56 rounded-full bg-white/10 blur-3xl"></div>
-              <div class="absolute -bottom-28 -left-20 h-64 w-64 rounded-full bg-[#A6D6C3]/12 blur-3xl"></div>
-              <div class="absolute right-10 top-10 opacity-60 text-white/55">
-                <svg class="icon">
-                  <use href="#i-star" />
-                </svg>
+    .hero-side{
+      display:grid;gap:12px
+    }
+    .badge-card{
+      padding:14px;min-height:68px;
+      display:flex;flex-direction:column;justify-content:center;gap:6px
+    }
+    .badge-card .t{font-size:12px;color:#8a7264;font-weight:800}
+    .badge-card .v{font-size:20px;font-weight:900;color:var(--ink)}
+    .badge-card .d{font-size:12px;color:#7b675b}
+
+    .route{
+      display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:2px
+    }
+    .route .mini{min-height:88px;padding-top:14px}
+    .route .icon{
+      width:28px;height:28px;border-radius:50%;display:grid;place-items:center;
+      margin:0 auto 8px;background:rgba(255,159,104,.15);color:#a75f34;font-size:15px
+    }
+    .route .mini:nth-child(2) .icon{background:rgba(191,230,215,.26);color:#4f7b68}
+    .route .mini:nth-child(3) .icon{background:rgba(185,220,255,.30);color:#5a7994}
+
+    .section-title{
+      display:flex;align-items:end;justify-content:space-between;gap:12px;margin:6px 2px 6px
+    }
+    .section-title h2{margin:0;font-size:18px;font-weight:900;letter-spacing:-.3px}
+    .section-title span{font-size:12px;color:#8a7264}
+
+    .feature-list{display:grid;gap:10px}
+    .feature{
+      padding:13px 14px;border-radius:22px;background:rgba(255,255,255,.62);
+      border:1px solid rgba(120,98,86,.10);display:flex;align-items:center;justify-content:space-between;gap:10px
+    }
+    .feature .left{display:flex;align-items:center;gap:10px;min-width:0}
+    .num-badge{
+      width:32px;height:32px;border-radius:50%;
+      display:grid;place-items:center;flex:0 0 auto;
+      background:linear-gradient(180deg, rgba(255,159,104,.18), rgba(255,255,255,.92));
+      border:1px solid rgba(255,159,104,.16);font-weight:900;color:#ad5f33
+    }
+    .feature h3{margin:0;font-size:15px;font-weight:900;line-height:1.1}
+    .feature p{margin:4px 0 0;font-size:12px;color:#7b675b;line-height:1.4}
+    .feature .right{
+      padding:8px 10px;border-radius:999px;background:rgba(255,255,255,.74);
+      border:1px solid rgba(120,98,86,.10);font-size:12px;color:#7b675b;white-space:nowrap
+    }
+
+    .two-col{display:grid;grid-template-columns:1fr .95fr;gap:12px;margin-top:12px;flex:1;min-height:0}
+    .panel{padding:14px}
+    .panel.fill{background:linear-gradient(180deg, rgba(255,255,255,.70), rgba(255,255,255,.40))}
+    .chiprow{display:flex;gap:8px;flex-wrap:wrap}
+    .chip{padding:8px 11px;border-radius:999px;background:rgba(255,255,255,.72);border:1px solid rgba(120,98,86,.10);font-size:12px;color:#725f52}
+    .today{
+      padding:14px;border-radius:24px;background:linear-gradient(180deg, rgba(255,214,107,.18), rgba(255,255,255,.48));
+      border:1px solid rgba(255,214,107,.18)
+    }
+    .today .top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+    .today .top strong{font-size:15px}
+    .today .top span{font-size:12px;color:#7b675b}
+    .bar{height:10px;border-radius:999px;background:rgba(120,98,86,.10);overflow:hidden;margin:10px 0 8px}
+    .bar i{display:block;height:100%;width:66%;border-radius:inherit;background:linear-gradient(90deg,var(--mint),var(--sky))}
+    .duo{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
+    .duo .mini{min-height:74px}
+    .duo .mini strong{font-size:18px}
+
+    .timeline{display:grid;gap:10px;margin-top:10px}
+    .age{
+      padding:14px;border-radius:22px;background:rgba(255,255,255,.62);border:1px solid rgba(120,98,86,.10);
+      display:flex;gap:12px;align-items:flex-start
+    }
+    .dot{
+      width:14px;height:14px;border-radius:50%;margin-top:5px;flex:0 0 auto;
+      background:linear-gradient(180deg, var(--primary), #fff)
+    }
+    .dot.mint{background:linear-gradient(180deg, #8bd6ba, #fff)}
+    .dot.sky{background:linear-gradient(180deg, #97c4ff, #fff)}
+    .age h3{margin:0;font-size:16px;font-weight:900}
+    .age p{margin:4px 0 0;font-size:12px;color:#7b675b;line-height:1.4}
+    .age .level{margin-left:auto;padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.74);border:1px solid rgba(120,98,86,.10);font-size:12px;color:#7b675b;white-space:nowrap}
+
+    .ai-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
+    .ai{
+      padding:13px;border-radius:22px;background:rgba(255,255,255,.62);border:1px solid rgba(120,98,86,.10);min-height:96px
+    }
+    .ai .k{display:flex;justify-content:space-between;gap:10px;font-size:12px;color:#8a7264;margin-bottom:6px}
+    .ai h3{margin:0;font-size:15px;font-weight:900}
+    .ai p{margin:5px 0 0;font-size:12px;color:#7b675b;line-height:1.4}
+
+    .sample{
+      margin-top:10px;padding:14px;border-radius:24px;background:linear-gradient(180deg, rgba(255,244,236,.92), rgba(255,255,255,.46));
+      border:1px solid rgba(255,159,104,.12)
+    }
+    .sample .top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+    .sample .top strong{font-size:15px}
+    .sample .top span{font-size:12px;padding:7px 10px;border-radius:999px;background:rgba(255,159,104,.14);color:#a75f34}
+    .sample p{margin:8px 0 0;font-size:13px;color:#7b675b}
+    .closing{
+      margin-top:10px;padding:16px;border-radius:24px;background:linear-gradient(90deg, rgba(255,159,104,.18), rgba(255,214,107,.16));
+      border:1px solid rgba(255,159,104,.12)
+    }
+    .closing h2{margin:0;font-size:23px;line-height:1.08;font-weight:900;letter-spacing:-.4px}
+    .closing h2 span{color:#c96f3d}
+    .closing p{margin-top:6px;font-size:13px;color:#6f5c50;line-height:1.45}
+
+    .value-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+    .value{
+      padding:14px;border-radius:22px;background:rgba(255,255,255,.62);border:1px solid rgba(120,98,86,.10);
+      min-height:120px;display:flex;flex-direction:column;justify-content:space-between
+    }
+    .value .icon{
+      width:38px;height:38px;border-radius:14px;display:grid;place-items:center;
+      background:rgba(255,214,107,.20);border:1px solid rgba(255,214,107,.16);font-size:18px
+    }
+    .value strong{display:block;font-size:15px;font-weight:900;margin-top:8px}
+    .value p{margin:6px 0 0;font-size:12px;color:#7b675b;line-height:1.45}
+
+    .bottom-cta{margin-top:auto;display:grid;grid-template-columns:1.25fr .75fr;gap:10px;padding-top:10px}
+    .btn{
+      padding:15px 14px;border-radius:18px;text-align:center;font-weight:900;font-size:14px;
+      background:rgba(255,255,255,.62);border:1px solid rgba(120,98,86,.10);color:var(--ink)
+    }
+    .btn.primary{
+      background:linear-gradient(90deg, rgba(255,159,104,.22), rgba(255,214,107,.22));
+      border-color:rgba(255,159,104,.14)
+    }
+
+    @media (max-width: 420px){
+      .sheet{width:100%;height:100%;border-radius:32px;padding:14px}
+      .page{padding-left:10px;padding-right:10px}
+      .grid2,.two-col,.route,.value-grid,.ai-grid,.highlight-row,.duo{grid-template-columns:1fr}
+      .bottom-cta{grid-template-columns:1fr}
+      h1{font-size:clamp(28px,7.4vw,40px)}
+      .big-num strong{font-size:54px}
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar"><strong>左右滑动</strong><span>每页 3 秒读懂</span><span class="dot"></span></div>
+
+    <div class="scroller" id="scroller">
+
+      <section class="page">
+        <article class="sheet">
+          <div class="inner">
+            <div class="head">
+              <div class="tag"><b>为什么需要</b> · 星语小剧场</div>
+              <div class="no">01 / 05</div>
+            </div>
+
+            <div class="hero card soft">
+              <div class="kicker"><span class="pill">①</span> 一眼看懂痛点、亮点、价值</div>
+              <h1>不是不会说<br>而是看不懂情绪</h1>
+              <p class="sub">很多自闭症孩子并不是不表达，而是不知道如何表达。星语小剧场把情绪训练做成孩子愿意玩的小游戏，让训练在家就能发生。</p>
+              <div class="pills">
+                <span class="pill primary">2–12 岁居家情绪训练</span>
+                <span class="pill mint">玩着练，不说教</span>
+                <span class="pill sky">家长可直接上手</span>
               </div>
             </div>
-            <div class="relative h-full w-full p-5 flex flex-col">
-              <div class="flex items-center justify-between text-[11px] tracking-widest text-white/70">
-                <span class="uppercase">为什么需要</span>
-                <span class="text-white/55">01 / 05</span>
-              </div>
 
-              <div class="mt-4 text-center">
-                <h1 class="text-[34px] font-extrabold leading-[1.08] tracking-tight text-white">
-                  不是不会说
-                  <span class="block">而是看不懂情绪</span>
-                </h1>
-                <p class="mt-2 text-[13px] font-medium text-white/80">
-                  很多自闭症孩子不是不表达，而是不知道如何表达
-                </p>
-              </div>
-
-              <div class="mt-5 space-y-3">
-                <div class="rounded-2xl bg-white/8 border border-white/12 px-4 py-4">
-                  <p class="text-[11px] tracking-widest text-white/65">核心数据</p>
-                  <div class="mt-2 flex items-end justify-between gap-3">
-                    <div class="min-w-0">
-                      <p class="text-[38px] leading-none font-extrabold text-[#F5D67B]">80%+</p>
-                      <p class="mt-1 text-sm font-medium text-white">存在情绪识别与表达困难</p>
-                    </div>
-                    <div class="pill text-[11px] text-white/80">
-                      <span class="font-semibold text-[#A6D6C3]">0-3 岁</span>
-                      <span>黄金干预期</span>
-                    </div>
-                  </div>
+            <div class="stack">
+              <div class="grid2">
+                <div class="card pain">
+                  <div class="label">核心痛点</div>
+                  <div class="big-num"><strong>80%+</strong><span>存在情绪识别与表达困难</span></div>
+                  <p style="margin:0;color:#7b675b;font-size:13px;line-height:1.45">不是缺少努力，而是缺少一套清晰、可坚持、适合家里使用的训练方式。</p>
                 </div>
-
-                <div class="grid grid-cols-3 gap-2">
-                  <div class="rounded-2xl bg-white/8 border border-white/12 px-3 py-3 text-center">
-                    <p class="text-sm font-semibold text-white">机构远</p>
-                    <p class="mt-1 text-[11px] text-white/70">难长期坚持</p>
+                <div class="hero-side">
+                  <div class="card badge-card">
+                    <div class="t">黄金窗口</div>
+                    <div class="v">0–3 岁</div>
+                    <div class="d">越早介入，越容易建立情绪命名与互动基础</div>
                   </div>
-                  <div class="rounded-2xl bg-white/8 border border-white/12 px-3 py-3 text-center">
-                    <p class="text-sm font-semibold text-white">训练枯燥</p>
-                    <p class="mt-1 text-[11px] text-white/70">孩子不配合</p>
-                  </div>
-                  <div class="rounded-2xl bg-white/8 border border-white/12 px-3 py-3 text-center">
-                    <p class="text-sm font-semibold text-white">不会练</p>
-                    <p class="mt-1 text-[11px] text-white/70">家长没方法</p>
+                  <div class="card badge-card">
+                    <div class="t">产品定位</div>
+                    <div class="v">AI 陪练</div>
+                    <div class="d">把专业情绪干预变成每天 10 分钟的家庭训练</div>
                   </div>
                 </div>
               </div>
 
-              <div class="mt-auto pt-4">
-                <div class="rounded-2xl bg-white/8 border border-white/12 px-4 py-3 text-center">
-                  <p class="text-sm font-semibold text-white">情绪训练，不该只存在机构里</p>
+              <div class="route">
+                <div class="mini">
+                  <div class="icon">远</div>
+                  <strong>机构远</strong>
+                  <span>时间、金钱、精力压力大</span>
                 </div>
+                <div class="mini">
+                  <div class="icon">慢</div>
+                  <strong>训练难坚持</strong>
+                  <span>枯燥训练让孩子抵触</span>
+                </div>
+                <div class="mini">
+                  <div class="icon">缺</div>
+                  <strong>家长不会练</strong>
+                  <span>缺少可执行的方法</span>
+                </div>
+              </div>
+
+              <div class="closing">
+                <h2>情绪训练，<br><span>不该只存在机构里</span></h2>
+                <p>我们要做的是：让专业干预走进家里，让孩子在轻松互动里慢慢学会看懂、说出、管理情绪。</p>
               </div>
             </div>
-          </article>
-        </section>
+          </div>
+        </article>
+      </section>
 
-        <section data-page class="min-h-screen min-w-full px-4 py-6 flex items-center justify-center snap-start">
-          <article
-            data-card
-            class="glass-card page-card relative w-[min(92vw,430px)] aspect-[9/16] overflow-hidden transform-gpu"
-          >
-            <div class="pointer-events-none absolute inset-0">
-              <div class="absolute -top-24 left-[-60px] h-64 w-64 rounded-full bg-[#A6D6C3]/14 blur-3xl"></div>
-              <div class="absolute bottom-[-120px] right-[-70px] h-72 w-72 rounded-full bg-[#F5D67B]/12 blur-3xl"></div>
+      <section class="page">
+        <article class="sheet">
+          <div class="inner">
+            <div class="head">
+              <div class="tag"><b>怎么玩</b> · 闯关式训练</div>
+              <div class="no">02 / 05</div>
             </div>
-            <div class="relative h-full w-full p-5 flex flex-col">
-              <div class="flex items-center justify-between text-[11px] tracking-widest text-white/70">
-                <span class="uppercase">怎么玩</span>
-                <span class="text-white/55">02 / 05</span>
-              </div>
 
-              <div class="mt-4 text-center">
-                <h2 class="text-[32px] font-extrabold leading-[1.1] tracking-tight text-white">玩着练，不说教</h2>
-                <p class="mt-2 text-[13px] font-medium text-white/80">三关卡循序渐进，一天 10 分钟也能坚持</p>
-              </div>
+            <h1>玩着练<br>不说教</h1>
+            <p class="sub">把训练拆成三关，孩子像在做游戏一样完成看懂别人、表达自己、学会应用的完整路径。</p>
 
-              <div class="mt-5 grid grid-cols-3 gap-3">
-                <div class="col-span-2 space-y-3">
-                  <div class="tile tile-strong">
-                    <div
-                      class="flex h-7 w-7 items-center justify-center rounded-full bg-[#F5D67B]/16 border border-white/12 text-[12px] font-semibold text-[#F5D67B]"
-                    >
-                      1
-                    </div>
-                    <div class="min-w-0">
-                      <p class="text-sm font-semibold text-white">看懂别人</p>
-                      <p class="mt-0.5 text-xs font-medium text-white/75">绘本故事里练情绪识别</p>
-                    </div>
-                  </div>
-
-                  <div class="tile tile-strong">
-                    <div
-                      class="flex h-7 w-7 items-center justify-center rounded-full bg-[#F5D67B]/16 border border-white/12 text-[12px] font-semibold text-[#F5D67B]"
-                    >
-                      2
-                    </div>
-                    <div class="min-w-0">
-                      <p class="text-sm font-semibold text-white">表达自己</p>
-                      <p class="mt-0.5 text-xs font-medium text-white/75">表情模仿，学会说出感受</p>
-                    </div>
-                  </div>
-
-                  <div class="tile tile-strong">
-                    <div
-                      class="flex h-7 w-7 items-center justify-center rounded-full bg-[#F5D67B]/16 border border-white/12 text-[12px] font-semibold text-[#F5D67B]"
-                    >
-                      3
-                    </div>
-                    <div class="min-w-0">
-                      <p class="text-sm font-semibold text-white">学会应用</p>
-                      <p class="mt-0.5 text-xs font-medium text-white/75">综合挑战，强化情绪管理</p>
-                    </div>
-                  </div>
+            <div class="two-col">
+              <div class="panel fill">
+                <div class="section-title">
+                  <h2>三关训练主线</h2><span>循序渐进</span>
                 </div>
-
-                <div class="rounded-2xl bg-white/8 border border-white/12 p-3 flex flex-col">
-                  <p class="text-[11px] tracking-widest text-white/65">今日训练</p>
-                  <div class="mt-2">
-                    <div class="flex items-center justify-between text-[11px] text-white/75">
-                      <span>已完成</span>
-                      <span class="font-semibold text-white">2 / 3</span>
+                <div class="feature-list">
+                  <div class="feature">
+                    <div class="left">
+                      <div class="num-badge">1</div>
+                      <div><h3>看懂别人</h3><p>绘本故事里练情绪识别</p></div>
                     </div>
-                    <div class="mt-2 h-2 rounded-full bg-white/10 overflow-hidden">
-                      <div class="h-full w-2/3 rounded-full bg-[#A6D6C3]"></div>
-                    </div>
-                    <div class="mt-3 rounded-xl bg-white/6 border border-white/12 px-2 py-2">
-                      <p class="text-[11px] text-white/70">下一关</p>
-                      <p class="mt-0.5 text-xs font-semibold text-white">表达自己</p>
-                    </div>
+                    <div class="right">故事理解</div>
                   </div>
-                  <div class="mt-auto pt-3">
-                    <div class="pill w-full justify-center text-[11px] text-white/80">
-                      <svg class="icon text-[#F5D67B]">
-                        <use href="#i-star" />
-                      </svg>
-                      <span>星星奖励</span>
+                  <div class="feature">
+                    <div class="left">
+                      <div class="num-badge">2</div>
+                      <div><h3>表达自己</h3><p>表情模仿，说出感受</p></div>
                     </div>
+                    <div class="right">表情模仿</div>
+                  </div>
+                  <div class="feature">
+                    <div class="left">
+                      <div class="num-badge">3</div>
+                      <div><h3>学会应用</h3><p>综合挑战，强化情绪管理</p></div>
+                    </div>
+                    <div class="right">生活迁移</div>
                   </div>
                 </div>
               </div>
 
-              <div class="mt-4">
-                <div class="flex flex-wrap justify-center gap-2">
-                  <span class="pill text-[11px] text-white/80">分龄适配</span>
-                  <span class="pill text-[11px] text-white/80">亲子共练</span>
-                  <span class="pill text-[11px] text-white/80">循环渐进</span>
-                  <span class="pill text-[11px] text-white/80">温柔引导</span>
+              <div class="panel">
+                <div class="today">
+                  <div class="top"><strong>今日训练</strong><span>10 分钟</span></div>
+                  <div style="font-size:30px;font-weight:900;line-height:1;">2 / 3</div>
+                  <div class="bar"><i></i></div>
+                  <p style="margin:0;color:#7b675b;font-size:13px">下一关：<strong style="color:var(--ink)">表达自己</strong></p>
                 </div>
-              </div>
-
-              <div class="mt-auto pt-4">
-                <div class="rounded-2xl bg-white/8 border border-white/12 px-4 py-3 text-center">
-                  <p class="text-sm font-semibold text-white">学习情绪，不该是一件痛苦的事</p>
+                <div class="duo">
+                  <div class="mini"><strong>星星</strong><span>奖励机制</span></div>
+                  <div class="mini"><strong>柔和</strong><span>训练节奏</span></div>
                 </div>
-              </div>
-            </div>
-          </article>
-        </section>
-
-        <section data-page class="min-h-screen min-w-full px-4 py-6 flex items-center justify-center snap-start">
-          <article
-            data-card
-            class="glass-card page-card relative w-[min(92vw,430px)] aspect-[9/16] overflow-hidden transform-gpu"
-          >
-            <div class="pointer-events-none absolute inset-0">
-              <div class="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-[#F5D67B]/12 blur-3xl"></div>
-              <div class="absolute bottom-[-150px] left-[-90px] h-80 w-80 rounded-full bg-[#A6D6C3]/14 blur-3xl"></div>
-            </div>
-            <div class="relative h-full w-full p-5 flex flex-col">
-              <div class="flex items-center justify-between text-[11px] tracking-widest text-white/70">
-                <span class="uppercase">分龄训练</span>
-                <span class="text-white/55">03 / 05</span>
-              </div>
-
-              <div class="mt-4 text-center">
-                <h2 class="text-[32px] font-extrabold leading-[1.1] tracking-tight text-white">分龄训练</h2>
-                <p class="mt-2 text-[13px] font-medium text-white/80">0–12 岁按发展规律训练，拒绝一刀切</p>
-              </div>
-
-              <div class="mt-5 space-y-3">
-                <div class="rounded-2xl bg-white/8 border border-white/12 px-4 py-4">
-                  <div class="flex items-start gap-3">
-                    <svg class="icon text-[#A6D6C3]">
-                      <use href="#i-seedling" />
-                    </svg>
-                    <div class="min-w-0">
-                      <p class="text-sm font-semibold text-white">0–3 岁</p>
-                      <p class="mt-1 text-xs font-medium text-white/75">喜怒哀乐分辨 · 情绪命名 · 安全感建立</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="rounded-2xl bg-white/8 border border-white/12 px-4 py-4">
-                  <div class="flex items-start gap-3">
-                    <svg class="icon text-[#A6D6C3]">
-                      <use href="#i-people" />
-                    </svg>
-                    <div class="min-w-0">
-                      <p class="text-sm font-semibold text-white">3–6 岁</p>
-                      <p class="mt-1 text-xs font-medium text-white/75">社交情绪理解 · 简单表达 · 同伴互动</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="rounded-2xl bg-white/8 border border-white/12 px-4 py-4">
-                  <div class="flex items-start gap-3">
-                    <svg class="icon text-[#A6D6C3]">
-                      <use href="#i-star" />
-                    </svg>
-                    <div class="min-w-0">
-                      <p class="text-sm font-semibold text-white">6–12 岁</p>
-                      <p class="mt-1 text-xs font-medium text-white/75">调节能力 · 冲动管理 · 校园适应</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="mt-auto pt-4">
-                <div class="rounded-2xl bg-white/8 border border-white/12 px-4 py-3">
-                  <p class="text-sm font-semibold text-white text-center">不同阶段，训练重点不同</p>
-                </div>
-              </div>
-            </div>
-          </article>
-        </section>
-
-        <section data-page class="min-h-screen min-w-full px-4 py-6 flex items-center justify-center snap-start">
-          <article
-            data-card
-            class="glass-card page-card relative w-[min(92vw,430px)] aspect-[9/16] overflow-hidden transform-gpu"
-          >
-            <div class="pointer-events-none absolute inset-0">
-              <div class="absolute -top-24 -left-24 h-72 w-72 rounded-full bg-white/10 blur-3xl"></div>
-              <div class="absolute bottom-[-140px] right-[-90px] h-80 w-80 rounded-full bg-[#A6D6C3]/14 blur-3xl"></div>
-            </div>
-            <div class="relative h-full w-full p-5 flex flex-col">
-              <div class="flex items-center justify-between text-[11px] tracking-widest text-white/70">
-                <span class="uppercase">AI 陪练</span>
-                <span class="text-white/55">04 / 05</span>
-              </div>
-
-              <div class="mt-4 text-center">
-                <h2 class="text-[32px] font-extrabold leading-[1.1] tracking-tight text-white">AI 陪练</h2>
-                <p class="mt-2 text-[13px] font-medium text-white/80">识别更灵敏，训练更轻松</p>
-              </div>
-
-              <div class="mt-5 grid grid-cols-2 gap-3">
-                <div class="rounded-2xl bg-white/8 border border-white/12 px-3 py-3">
-                  <div class="flex items-start gap-2">
-                    <svg class="icon text-[#F5D67B]">
-                      <use href="#i-camera" />
-                    </svg>
-                    <div class="min-w-0">
-                      <p class="text-xs font-semibold text-white">识别表情</p>
-                      <p class="mt-1 text-[11px] font-medium text-white/75">摄像头捕捉情绪线索</p>
-                    </div>
-                  </div>
-                </div>
-                <div class="rounded-2xl bg-white/8 border border-white/12 px-3 py-3">
-                  <div class="flex items-start gap-2">
-                    <svg class="icon text-[#F5D67B]">
-                      <use href="#i-magic" />
-                    </svg>
-                    <div class="min-w-0">
-                      <p class="text-xs font-semibold text-white">增强线索</p>
-                      <p class="mt-1 text-[11px] font-medium text-white/75">弱表情也能被看见</p>
-                    </div>
-                  </div>
-                </div>
-                <div class="rounded-2xl bg-white/8 border border-white/12 px-3 py-3">
-                  <div class="flex items-start gap-2">
-                    <svg class="icon text-[#F5D67B]">
-                      <use href="#i-pace" />
-                    </svg>
-                    <div class="min-w-0">
-                      <p class="text-xs font-semibold text-white">自动调节</p>
-                      <p class="mt-1 text-[11px] font-medium text-white/75">难度随状态轻轻变化</p>
-                    </div>
-                  </div>
-                </div>
-                <div class="rounded-2xl bg-white/8 border border-white/12 px-3 py-3">
-                  <div class="flex items-start gap-2">
-                    <svg class="icon text-[#F5D67B]">
-                      <use href="#i-heart" />
-                    </svg>
-                    <div class="min-w-0">
-                      <p class="text-xs font-semibold text-white">及时鼓励</p>
-                      <p class="mt-1 text-[11px] font-medium text-white/75">反馈更明确、更温柔</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="mt-4 rounded-2xl bg-white/8 border border-white/12 px-4 py-4">
-                <div class="flex items-center justify-between gap-3">
-                  <div class="flex items-center gap-2 min-w-0">
-                    <svg class="icon text-[#A6D6C3]">
-                      <use href="#i-smile" />
-                    </svg>
-                    <p class="text-sm font-semibold text-white truncate">识别到：开心</p>
-                  </div>
-                  <span class="pill text-[11px] text-white/80">很确定</span>
-                </div>
-                <div class="mt-3 h-2.5 rounded-full bg-white/10 overflow-hidden">
-                  <div class="h-full w-[78%] rounded-full bg-[#A6D6C3]"></div>
-                </div>
-                <p class="mt-2 text-xs font-medium text-white/75">下一步：引导孩子说出“我现在很开心”。</p>
-              </div>
-
-              <div class="mt-auto pt-4">
-                <div class="rounded-2xl bg-white/8 border border-white/12 px-4 py-3 text-center">
-                  <p class="text-xs font-medium text-white/80">
-                    从认知到表达再到应用，AI 负责辅助，陪伴仍来自家长
-                  </p>
+                <div class="closing" style="margin-top:10px">
+                  <h2 style="font-size:20px"><span>分龄适配</span><br>亲子共练</h2>
+                  <p>让训练更容易启动，也更容易坚持。</p>
                 </div>
               </div>
             </div>
-          </article>
-        </section>
+          </div>
+        </article>
+      </section>
 
-        <section data-page class="min-h-screen min-w-full px-4 py-6 flex items-center justify-center snap-start">
-          <article
-            data-card
-            class="glass-card page-card relative w-[min(92vw,430px)] aspect-[9/16] overflow-hidden transform-gpu"
-          >
-            <div class="pointer-events-none absolute inset-0">
-              <div class="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-[#A6D6C3]/14 blur-3xl"></div>
-              <div class="absolute bottom-[-150px] left-[-90px] h-80 w-80 rounded-full bg-[#F5D67B]/12 blur-3xl"></div>
+      <section class="page">
+        <article class="sheet">
+          <div class="inner">
+            <div class="head">
+              <div class="tag"><b>分龄训练</b> · 精准陪伴</div>
+              <div class="no">03 / 05</div>
             </div>
-            <div class="relative h-full w-full p-5 flex flex-col">
-              <div class="flex items-center justify-between text-[11px] tracking-widest text-white/70">
-                <span class="uppercase">价值</span>
-                <span class="text-white/55">05 / 05</span>
-              </div>
 
-              <div class="mt-4 text-center">
-                <h2 class="text-[32px] font-extrabold leading-[1.1] tracking-tight text-white">让陪伴更轻松</h2>
-                <p class="mt-2 text-[13px] font-medium text-white/80">把情绪训练带回家，让陪伴更有方向</p>
-              </div>
+            <h1>不同年龄<br>练不同能力</h1>
+            <p class="sub">不做一刀切，而是把训练放到最适合的阶段，降低抵触，提高效果。</p>
 
-              <div class="mt-5 space-y-3">
-                <div class="rounded-2xl bg-white/8 border border-white/12 px-4 py-4">
-                  <div class="flex items-start gap-3">
-                    <svg class="icon text-[#F5D67B]">
-                      <use href="#i-home-heart" />
-                    </svg>
-                    <div class="min-w-0">
-                      <p class="text-sm font-semibold text-white">家庭</p>
-                      <p class="mt-1 text-xs font-medium text-white/75">减轻陪护负担，训练路径更清晰</p>
-                    </div>
-                  </div>
+            <div class="timeline">
+              <div class="age">
+                <div class="dot"></div>
+                <div>
+                  <h3>0–3 岁</h3>
+                  <p>喜怒哀乐分辨 · 情绪命名 · 安全感建立</p>
                 </div>
-                <div class="rounded-2xl bg-white/8 border border-white/12 px-4 py-4">
-                  <div class="flex items-start gap-3">
-                    <svg class="icon text-[#F5D67B]">
-                      <use href="#i-child" />
-                    </svg>
-                    <div class="min-w-0">
-                      <p class="text-sm font-semibold text-white">儿童</p>
-                      <p class="mt-1 text-xs font-medium text-white/75">看懂情绪，表达自己，慢慢学会调节</p>
-                    </div>
-                  </div>
-                </div>
-                <div class="rounded-2xl bg-white/8 border border-white/12 px-4 py-4">
-                  <div class="flex items-start gap-3">
-                    <svg class="icon text-[#F5D67B]">
-                      <use href="#i-people" />
-                    </svg>
-                    <div class="min-w-0">
-                      <p class="text-sm font-semibold text-white">社会</p>
-                      <p class="mt-1 text-xs font-medium text-white/75">让更多家庭获得可负担的优质干预资源</p>
-                    </div>
-                  </div>
-                </div>
+                <div class="level">黄金期</div>
               </div>
-
-              <div class="mt-auto pt-4">
-                <p class="text-center text-[22px] leading-[1.25] font-extrabold text-white">
-                  早干预，早陪伴
-                  <span class="block text-[#F5D67B]">让每次情绪都被理解</span>
-                </p>
+              <div class="age">
+                <div class="dot mint"></div>
+                <div>
+                  <h3>3–6 岁</h3>
+                  <p>社交情绪理解 · 简单表达 · 同伴互动</p>
+                </div>
+                <div class="level">社交启蒙</div>
+              </div>
+              <div class="age">
+                <div class="dot sky"></div>
+                <div>
+                  <h3>6–12 岁</h3>
+                  <p>自我调节 · 冲动管理 · 校园适应</p>
+                </div>
+                <div class="level">进阶训练</div>
               </div>
             </div>
-          </article>
-        </section>
-      </div>
+
+            <div class="closing">
+              <h2>拒绝一刀切<br><span>让训练更精准</span></h2>
+              <p>每个阶段只抓最关键能力，孩子更容易接受，家长也更容易执行。</p>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="page">
+        <article class="sheet">
+          <div class="inner">
+            <div class="head">
+              <div class="tag"><b>AI 陪练</b> · 更懂孩子</div>
+              <div class="no">04 / 05</div>
+            </div>
+
+            <h1>AI 不是噱头<br>而是更懂孩子</h1>
+            <p class="sub">它负责识别、节奏和反馈，帮家长把训练做得更清楚、更轻松，也更容易坚持。</p>
+
+            <div class="ai-grid">
+              <div class="ai">
+                <div class="k"><span>01</span><span>识别</span></div>
+                <h3>摄像头表情识别</h3>
+                <p>捕捉细微情绪线索，辅助训练判断</p>
+              </div>
+              <div class="ai">
+                <div class="k"><span>02</span><span>增强</span></div>
+                <h3>弱表情强化</h3>
+                <p>适配“表情偏弱”的孩子特点</p>
+              </div>
+              <div class="ai">
+                <div class="k"><span>03</span><span>节奏</span></div>
+                <h3>自动调节难度</h3>
+                <p>卡住时慢一点，顺利时再推进</p>
+              </div>
+              <div class="ai">
+                <div class="k"><span>04</span><span>鼓励</span></div>
+                <h3>即时正向反馈</h3>
+                <p>星星奖励 + 温柔提示，提升意愿</p>
+              </div>
+            </div>
+
+            <div class="sample">
+              <div class="top"><strong>本轮识别到：开心</strong><span>很确定</span></div>
+              <div class="bar"><i style="width:82%"></i></div>
+              <p>下一步：引导孩子说出“我现在很开心”。</p>
+            </div>
+
+            <div class="closing">
+              <h2><span>AI 负责辅助</span><br>陪伴仍来自家长</h2>
+              <p>从认知到表达再到应用，让训练更清楚、更有方向。</p>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="page">
+        <article class="sheet">
+          <div class="inner">
+            <div class="head">
+              <div class="tag"><b>价值收束</b> · 让陪伴更轻松</div>
+              <div class="no">05 / 05</div>
+            </div>
+
+            <h1>让陪伴更轻松</h1>
+            <p class="sub">把情绪训练带回家，让孩子慢慢学会看懂、说出、管理情绪，也让家庭少一点压力，多一点方向。</p>
+
+            <div class="value-grid">
+              <div class="value">
+                <div class="icon">🏠</div>
+                <div>
+                  <strong>家庭减负</strong>
+                  <p>少奔波、少焦虑，训练路径更清晰</p>
+                </div>
+              </div>
+              <div class="value">
+                <div class="icon">👶</div>
+                <div>
+                  <strong>儿童增能</strong>
+                  <p>看懂情绪，表达自己，慢慢学会调节</p>
+                </div>
+              </div>
+              <div class="value">
+                <div class="icon">🌱</div>
+                <div>
+                  <strong>社会普惠</strong>
+                  <p>让更多家庭获得可负担的优质干预资源</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="closing">
+              <h2><span>早干预</span>，早陪伴</h2>
+              <p>让每次情绪都被理解，让每个星星孩子都能慢慢发光。</p>
+            </div>
+
+            <div class="bottom-cta">
+              <div class="btn primary">星语小剧场 · AI 居家情绪干预</div>
+              <div class="btn">立即体验 Demo</div>
+            </div>
+          </div>
+        </article>
+      </section>
+
     </div>
+  </div>
 
-    <script>
-      const deck = document.getElementById("deck");
-      const prefersReduceMotion =
-        window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      const pages = Array.from(deck.querySelectorAll("[data-page]"));
-      const cards = pages.map((page) => page.querySelector("[data-card]"));
+  <script>
+    const scroller = document.getElementById('scroller');
+    let lock = false;
 
-      let rafId = null;
-      const clamp01 = (n) => Math.min(1, Math.max(0, n));
-      const updatePageTransforms = () => {
-        const w = deck.clientWidth || 1;
-        const x = deck.scrollLeft;
+    scroller.addEventListener('wheel', (e) => {
+      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+        e.preventDefault();
+        if (lock) return;
+        lock = true;
+        scroller.scrollBy({ left: e.deltaY > 0 ? window.innerWidth : -window.innerWidth, behavior: 'smooth' });
+        setTimeout(() => lock = false, 650);
+      }
+    }, { passive: false });
 
-        for (let i = 0; i < cards.length; i += 1) {
-          const card = cards[i];
-          if (!card) continue;
-
-          const progress = (x - i * w) / w;
-          const distance = clamp01(Math.abs(progress));
-          const scale = 1 - distance * 0.04;
-          const opacity = 1 - distance * 0.28;
-          const translateX = -progress * 28;
-          const blur = prefersReduceMotion ? 0 : distance * 6;
-
-          card.style.transform = `translate3d(${translateX}px,0,0) scale(${scale})`;
-          card.style.opacity = `${opacity}`;
-          card.style.filter = `blur(${blur}px)`;
-        }
-      };
-
-      const requestUpdate = () => {
-        if (rafId !== null) return;
-        rafId = window.requestAnimationFrame(() => {
-          rafId = null;
-          updatePageTransforms();
-        });
-      };
-
-      const scrollToPage = (direction) => {
-        const w = deck.clientWidth;
-        const next = Math.round(deck.scrollLeft / w) * w + direction * w;
-        deck.scrollTo({ left: next, behavior: "smooth" });
-      };
-
-      deck.addEventListener(
-        "wheel",
-        (e) => {
-          if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
-          deck.scrollLeft += e.deltaY;
-          e.preventDefault();
-        },
-        { passive: false }
-      );
-
-      deck.addEventListener("scroll", requestUpdate, { passive: true });
-      window.addEventListener("resize", requestUpdate);
-      requestUpdate();
-
-      window.addEventListener("keydown", (e) => {
-        if (e.key === "ArrowRight") scrollToPage(1);
-        if (e.key === "ArrowLeft") scrollToPage(-1);
-      });
-    </script>
-  </body>
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') scroller.scrollBy({ left: window.innerWidth, behavior: 'smooth' });
+      if (e.key === 'ArrowLeft') scroller.scrollBy({ left: -window.innerWidth, behavior: 'smooth' });
+    });
+  </script>
+</body>
 </html>
